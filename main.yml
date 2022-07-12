@@ -6,7 +6,7 @@
     - nginx.vars
     - secret.vars
   tasks:
-    - name: "Installing Nginx and php8.1-fpm"
+    - name: "PHP version changed-Installing Nginx and php8.1-fpm"
       apt:
         name: 
           - nginx
@@ -58,7 +58,6 @@
       notify:
         - restart/enable-nginx-php8.1-fpm 
      
-        
         
         
   handlers:
