@@ -41,6 +41,22 @@
         - restart/enable-nginx-php8.1-fpm
         
         
+    - name: "cloning from Git"
+      git:
+        dest: "{{ git_dir }}"
+        repo: "{{ git_url }}"
+      register: git_status
+
+    - name: "Copying content to document root /var/www/{{ domain_name }}"
+      when: git_status.changed == true
+      copy:
+        src: "{{ git_dir }}"
+        dest: "/var/www/{{ domain_name }}"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_group }}"
+        remote_src: yes 
+        
+        
         
         
   handlers:
