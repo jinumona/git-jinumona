@@ -2,6 +2,9 @@
 - name: "Ubuntu-nginx-site from Git"
   become: yes
   hosts: ubuntu
+  vars_files:
+    - nginx.vars
+    - secret.vars
   tasks:
     - name: "Installing Nginx and php8.1-fpm"
       apt:
@@ -14,10 +17,32 @@
         update_cache: yes
       notify:
         - restart/enable-nginx-php8.1-fpm
+
+    - name: "Creating Document root /var/www/{{ domain_name }}"
+      file:
+        group: "{{ nginx_group }}"
+        owner: "{{ nginx_user }}"
+        path: "/var/www/{{ domain_name }}"
+        state: directory
+
+    - name: "Creating nginx conf /etc/nginx/sites-available/{{ domain_name }}.conf"
+      template:
+        dest: "/etc/nginx/sites-available/{{ domain_name }}.conf"
+        src: vhost.tmpl
+      notify:
+        - restart/enable-nginx-php8.1-fpm
+
+    - name: "Enabling nginx conf /etc/nginx/sites-available/{{ domain_name }}.conf"
+      file:
+        src: "/etc/nginx/sites-available/{{ domain_name }}.conf"
+        state: link
+        path: "/etc/nginx/sites-enabled/{{ domain_name }}.conf"
+      notify:
+        - restart/enable-nginx-php8.1-fpm
         
         
         
-      
+        
   handlers:
     - name: "restart/enable-nginx-php8.1-fpm"
       service:
@@ -26,4 +51,4 @@
         state: restarted
       with_items:
         - nginx
-        - php8.1-fpm  
+        - php8.1-fpm

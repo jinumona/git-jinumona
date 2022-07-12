@@ -1,2 +1,3 @@
 ansible.pem
 hosts
+secret.vars
